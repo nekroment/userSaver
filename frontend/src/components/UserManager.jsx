@@ -6,11 +6,18 @@ const queryString = require('query-string');
 
 const UserManager = (props) => {
 
+    const emptyUser = {
+        name: '',
+        email: '',
+        img: '',
+        _id: ''
+    }
+
     const [googleLink, setGoogleLink] = useState('');
-    const [token, setToken] = useState('');
     const [users, setUsers] = useState([]);
     const [modal, setModal] = useState({});
     const [isAuth, setIsAuth] = useState(false);
+    const [userData, setUserData] = useState(emptyUser);
 
     const redirect = 'http://localhost:3002';
 
@@ -29,16 +36,31 @@ const UserManager = (props) => {
 
     async function getUserToken() {
         let search = queryString.parse(props.location.search);
-        if(search.code) {
+        if (search.code) {
             try {
-                const response = await authAPI.login(search.code, redirect);
-                debugger
+
+                const response = await authAPI.login(userData._id, search.code, redirect);
+                setUserData(user => response.data);
+                setIsAuth(isAuth => true);
+                localStorage.setItem('_id', response.data._id);
             } catch (error) {
-                debugger
             }
         }
     }
 
+    async function logOut() {
+        setIsAuth(isAuth => false);
+        setUserData(user => emptyUser);
+        localStorage.removeItem('_id');
+    }
+
+    useEffect(async () => {
+        if(localStorage.getItem('_id')) {
+            const response = await authAPI.login(localStorage.getItem('_id'), '', redirect);
+                setUserData(user => response.data);
+                setIsAuth(isAuth => true);
+        }
+    }, [])
     useEffect(() => {
         getUserToken();
     }, [])
@@ -54,7 +76,14 @@ const UserManager = (props) => {
     console.log(users);
     return (
         <div>
-            <a href={`${googleLink}`}>Login with Google</a>
+            <nav class="navbar navbar-light bg-info">
+                <span class="navbar-brand h1">
+                    <img src={userData.img} className={isAuth ? '' :'hidden'} width="30" height="30" alt="" loading="lazy" />
+                    <p  className={isAuth ? '' :'hidden'} >{userData.name}</p>
+                </span>
+                <a href={`${googleLink}`} className={"btn btn-default btn-lg" + " " + (!isAuth ? '' :'hidden')} role="button">Login with Google</a>
+                <a onClick={logOut} className={"btn btn-default btn-lg" + ' ' + (isAuth ? '' :'hidden')} role="button">LogOut</a>
+            </nav>
             <NotSavedUsersColumn users={users} />
         </div>
     )

@@ -8,8 +8,8 @@ export const authAPI = {
     async connection(redirect) {
         return await instance.post('/auth/connection', {redirect});
     },
-    async login(token, redirect) {
-        return await instance.post('/auth/login', {token, redirect});
+    async login(_id, code, redirect) {
+        return await instance.post('/auth/login', {_id, code, redirect});
     }
 }
 
