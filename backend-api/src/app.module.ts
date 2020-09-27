@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { MongooseModule } from '@nestjs/mongoose';
+require('dotenv/config');
 
+const connectionString = 'mongodb+srv://moonlight:382001@cluster0.zkmbj.mongodb.net/saveUser?retryWrites=true&w=majority'
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [MongooseModule.forRoot(connectionString), AuthModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
