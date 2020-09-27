@@ -42,6 +42,7 @@ const UserManager = (props) => {
                 const response = await authAPI.login(userData._id, search.code, redirect);
                 setUserData(user => response.data);
                 setIsAuth(isAuth => true);
+                console.log(response.data._id)
                 localStorage.setItem('_id', response.data._id);
             } catch (error) {
             }
@@ -73,7 +74,6 @@ const UserManager = (props) => {
         getUsers();
     }, [isAuth]);
 
-    console.log(users);
     return (
         <div>
             <nav class="navbar navbar-light bg-info">

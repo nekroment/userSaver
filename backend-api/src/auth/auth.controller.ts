@@ -23,7 +23,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDTO) {
     if (body._id != '') {
-      const userExists = this.authService.findUser(body._id);
+      const userExists = await this.authService.findUser(body._id);
       if (userExists) {
         return userExists;
       }

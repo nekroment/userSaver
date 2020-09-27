@@ -54,6 +54,11 @@ export class AuthService {
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`,
     );
 
+    const userExists = await this.authModel.findOne({email: user.data.email});
+    if(userExists) {
+        return userExists;
+    }
+
     const newUser = new this.authModel({
       name: user.data.name,
       email: user.data.email,
