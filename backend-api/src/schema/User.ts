@@ -40,6 +40,9 @@ export class User extends Document {
         catchPhrase: string,
         bs: string
     }
+
+    @Prop()
+    _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
