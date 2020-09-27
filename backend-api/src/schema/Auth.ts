@@ -11,9 +11,6 @@ export class Auth extends Document {
 
     @Prop({required: true})
     img: string;
-
-    @Prop({required: true})
-    token: string;
 }
 
 export const AuthSchema = SchemaFactory.createForClass(Auth);

@@ -6,11 +6,12 @@ export class LoginDTO {
     redirect: string;
 
     @IsString()
-    token: string;
-
-    @IsNotEmpty()
-    @IsString()
     code: string;
+
+    @IsString()
+    _id: string;
+
+
 }
 
 export class ConnectDTO {

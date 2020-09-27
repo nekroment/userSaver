@@ -17,16 +17,16 @@ export class User extends Document {
     email: string;
 
     @Prop({required: true})
-    adress: {
+    adress: [{
         street: string,
         suite: string,
         city: string,
         zipcode: string,
-        geo: {
+        geo: [{
             lat: string,
             lng: string
-        }
-    };
+        }]
+    }];
 
     @Prop({required: true})
     phone: string;
@@ -35,11 +35,11 @@ export class User extends Document {
     website: string;
 
     @Prop({required: true})
-    company: {
+    company: [{
         name: string,
         catchPhrase: string,
         bs: string
-    }
+    }]
 
     @Prop()
     _id: string;

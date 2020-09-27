@@ -4,14 +4,15 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { google } from 'googleapis';
 import Axios from 'axios';
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv/config');
 
 @Injectable()
 export class AuthService {
   constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) {}
 
-  async findUser(token: string): Promise<Auth> {
-    return this.authModel.findOne({ token: token });
+  async findUser(_id: string): Promise<Auth> {
+    return this.authModel.findOne({ _id: _id });
   }
 
   async connection(redirect: string) {
@@ -28,11 +29,26 @@ export class AuthService {
     );
   }
 
-  async saveUser(redirect: string, code: string): Promise<Auth> {
+  async saveUser(redirect: string, code: string): Promise<Auth | string> {
     const auth = await this.connection(redirect);
 
     const data = await auth.getToken(code);
     const token = data.tokens.id_token;
+
+    const client = new OAuth2Client(process.env.CLIENT_ID);
+    async function verify() {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      const userid = payload['sub'];
+    }
+    try {
+      verify();
+    } catch (error) {
+      throw error;
+    }
 
     const user = await Axios.get(
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`,
@@ -41,8 +57,7 @@ export class AuthService {
     const newUser = new this.authModel({
       name: user.data.name,
       email: user.data.email,
-      picture: user.data.picture,
-      token,
+      img: user.data.picture,
     });
     return newUser.save();
   }
