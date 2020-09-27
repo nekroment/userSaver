@@ -1,4 +1,4 @@
-import { User } from './../schema/User';
+import { Auth } from '../schema/Auth';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,10 +8,10 @@ require('dotenv/config');
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) {}
 
-  async findUser(token: string): Promise<User> {
-    return this.userModel.findOne({ token: token });
+  async findUser(token: string): Promise<Auth> {
+    return this.authModel.findOne({ token: token });
   }
 
   async connection(redirect: string) {
@@ -28,7 +28,7 @@ export class AuthService {
     );
   }
 
-  async saveUser(redirect: string, code: string): Promise<User> {
+  async saveUser(redirect: string, code: string): Promise<Auth> {
     const auth = await this.connection(redirect);
 
     const data = await auth.getToken(code);
@@ -38,7 +38,7 @@ export class AuthService {
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`,
     );
 
-    const newUser = new this.userModel({
+    const newUser = new this.authModel({
       name: user.data.name,
       email: user.data.email,
       picture: user.data.picture,
