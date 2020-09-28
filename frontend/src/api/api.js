@@ -17,6 +17,9 @@ export const userAPI = {
     async getUsers() {
         return await axios.get('https://jsonplaceholder.typicode.com/users');
     },
+    async getPosts() {
+        return await axios.get('https://jsonplaceholder.typicode.com/posts');
+    },
     async findeUsers(id) {
         return await instance.get(`/user/${id}`);
     },

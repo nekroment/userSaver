@@ -24,7 +24,7 @@ const NotSavedusersColumn = (props) => {
             }
 
         });
-        return sortUser.map(user => <User key={user.id} user={user} />)
+        return sortUser.map(user => <User openModal={props.openModal} key={user.id} user={user} />)
     }
 
     const changeSort = () => {
