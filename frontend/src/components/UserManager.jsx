@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import ModalWindow from './ModalWindow';
 const queryString = require('query-string');
 require('dotenv/config');
+Modal.setAppElement('#root');
 
 const UserManager = (props) => {
 
@@ -30,7 +31,7 @@ const UserManager = (props) => {
     //Запрос пользователей
     async function getUsers() {
         const response = await userAPI.getUsers();
-        setUsers((users) => { return response.data});
+        setUsers((users) => { return response.data });
     }
 
     //Запрос постов
@@ -72,9 +73,17 @@ const UserManager = (props) => {
 
     async function openModal(user) {
         const userPosts = await posts.filter(post => post.userId === user.id);
-            setModalPosts(() => {return userPosts});
-            setModalUser(() => {return user});
-            setIsModal(isModal => true);
+        setModalPosts(() => { return userPosts });
+        setModalUser(() => { return user });
+        setIsModal(isModal => true);
+
+    }
+
+    async function closeModal() {
+
+        setModalPosts(() => { return [] });
+        setModalUser(() => { return {} });
+        setIsModal(isModal => false);
 
     }
 
@@ -104,7 +113,7 @@ const UserManager = (props) => {
     }, [isAuth]);
 
     return (
-        <div>
+        <>
             <nav class="navbar navbar-light bg-info">
                 <span class="navbar-brand h1">
                     <img src={userData.img} className={isAuth ? '' : 'hidden'} width="30" height="30" alt="" loading="lazy" />
@@ -113,11 +122,27 @@ const UserManager = (props) => {
                 <a href={`${googleLink}`} className={"btn btn-default btn-lg" + " " + (!isAuth ? '' : 'hidden')} role="button">Login with Google</a>
                 <a onClick={logOut} className={"btn btn-default btn-lg" + ' ' + (isAuth ? '' : 'hidden')} role="button">LogOut</a>
             </nav>
-            <NotSavedUsersColumn openModal={openModal} users={users} />
-            <Modal isOpen={isModal}>
+            <div className="container">
+                <div className="row">
+                    <div className={"col-lg-5 col-md-5 col-sm-10 col-xs-10"}>
+                        <NotSavedUsersColumn openModal={openModal} users={users} />
+                    </div>
+                    <div className={"col-lg-5 col-md-5 col-sm-10 col-xs-10 offset-lg-1 offset-md-1"}>
+                        <NotSavedUsersColumn openModal={openModal} users={users} />
+                    </div>
+                </div>
+            </div>
+            <Modal
+                isOpen={isModal}
+                onRequestClose={closeModal}
+                style={{
+                    overlay: {
+                        backgroundColor: 'grey'
+                    }
+                }}>
                 <ModalWindow user={modalUser} posts={modalPosts} />
             </Modal>
-        </div>
+        </>
     )
 }
 

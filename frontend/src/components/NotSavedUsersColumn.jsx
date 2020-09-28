@@ -34,8 +34,9 @@ const NotSavedusersColumn = (props) => {
     const usersCards = createUserCard(props.users);
     return (
         <>
-            <div className={'container'}>
-                <form onSubmit={changeSort}>
+
+                    <div style={{backgroundColor:"blue"}}>
+                        <form onSubmit={changeSort}>
                     <select ref={ref} onChange={changeSort} className="form-control">
                         <option value='username' selected>Username</option>
                         <option value='email' >Email</option>
@@ -44,7 +45,8 @@ const NotSavedusersColumn = (props) => {
                     </select>
                 </form>
                 {usersCards}
-            </div>
+                    </div>
+                
         </>
     )
 }

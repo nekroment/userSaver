@@ -2,7 +2,7 @@ import React from 'react';
 
 const User = ({user, openModal}) => {
     return (
-        <div onDoubleClick={() => openModal(user)} className={'jumbotron'}>
+        <div onDoubleClick={() => openModal(user)} className={'jumbotron m-3 align-self-center'}>
             <h1>{user.name}</h1>
             <hr class="my-4"></hr>
             <p>username: {user.username}</p>
