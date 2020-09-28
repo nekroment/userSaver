@@ -42,7 +42,7 @@ export class User extends Document {
     }]
 
     @Prop()
-    _id: string;
+    authId: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

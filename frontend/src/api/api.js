@@ -20,13 +20,13 @@ export const userAPI = {
     async getPosts() {
         return await axios.get('https://jsonplaceholder.typicode.com/posts');
     },
-    async findeUsers(id) {
+    async findUsers(id) {
         return await instance.get(`/user/${id}`);
     },
-    async deleteUser(id) {
-        return await instance.delete(`/user/${id}`);
+    async deleteUser(user, authId) {
+        return await instance.delete(`/user/${user.id}/${authId}`);
     },
-    async saveUser(user, id) {
-        return await instance.post('/user', {user, id});
+    async saveUser(user, authId) {
+        return await instance.post('/user', {user, authId});
     }
 }

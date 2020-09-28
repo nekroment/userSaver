@@ -8,16 +8,17 @@ export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
     async findSavedUsers(id: string) {
-        return await this.userModel.find({_id: id});
+        return await this.userModel.find({authId: id});
     }
 
-    async saveUser(user: User, id: string) {
-        const newUser = user._id = id;
+    async saveUser(user: User, authId: string) {
+        const newUser = user;
+        newUser.authId = authId;
         const createUser = new this.userModel(newUser);
         return await createUser.save();
     }
 
-    async deleteUser(id: string) {
-        return await this.userModel.remove({id: id});
+    async deleteUser(id: number | string, authId: string) {
+        return await this.userModel.remove({id: id, authId: authId})
     }
 }

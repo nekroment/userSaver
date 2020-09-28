@@ -3,11 +3,11 @@ import User from './User';
 import { useDrop } from 'react-dnd';
 import { ItemTypes } from '../common/ItemTypes';
 
-const NotSavedUsersColumn = (props) => {
+const SavedUsersColumn = (props) => {
 
     const [{ canDrop, isOver }, drop] = useDrop({
         accept: ItemTypes.USER,
-        drop: () => ({ name: 'deleteColumn' }),
+        drop: () => ({ name: 'saveColumn' }),
         collect: (monitor) => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop()
@@ -35,7 +35,7 @@ const NotSavedUsersColumn = (props) => {
             }
 
         });
-        return sortUser.map(user => <User isSaved={false} saveUser={props.saveUser} openModal={props.openModal} key={user.id} user={user} />)
+        return sortUser.map(user => <User isSaved={true} deleteUser={props.deleteUser} openModal={props.openModal} key={user.id} user={user} />)
     }
 
     const changeSort = () => {
@@ -57,9 +57,9 @@ const NotSavedUsersColumn = (props) => {
                 </form>
                 {usersCards.length > 0 ? usersCards :
                         <div style={{ wordWrap: 'break-word', }} className={'jumbotron m-3 align-self-center'}>
-                            <p style={{ fontWeight: 'bolder' }}>Нет не сохраненных данных</p>
+                            <p style={{ fontWeight: 'bolder' }}>Нет сохранненных пользователей</p>
                             <hr class="my-4"></hr>
-                            <p>Перетащите сюда карточку пользователя, чтобы удалить</p>
+                            <p>Перетащите сюда карточку пользователя, чтобы сохранить</p>
                         </div>
                 }
             </div>
@@ -68,4 +68,4 @@ const NotSavedUsersColumn = (props) => {
     )
 }
 
-export default NotSavedUsersColumn;
+export default SavedUsersColumn;

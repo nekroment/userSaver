@@ -3,10 +3,9 @@ import { User } from 'src/schema/User';
 
 export class UserDTO {
 
-    @IsNotEmpty()
-    @IsString()
+    user: User;
+
     id: string;
 
-    @IsNotEmpty()
-    user: User;
+    authId: string;
 }

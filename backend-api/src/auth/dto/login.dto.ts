@@ -4,7 +4,7 @@ export class LoginDTO {
 
     @IsString()
     redirect: string;
-
+    
     @IsString()
     code: string;
 

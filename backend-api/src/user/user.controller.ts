@@ -11,14 +11,13 @@ export class UserController {
         return await this.userService.findSavedUsers(params.id);
     }
 
-    @Delete(':id')
-    async deleteUser (@Param() params) {
-        return await this.userService.deleteUser(params.id);
+    @Delete(':id/:authId')
+    async deleteUser (@Param() params: UserDTO) {
+        return await this.userService.deleteUser(params.id, params.authId);
     }
-
     @Post()
     async saveUser (@Body() body: UserDTO) {
-        return await this.userService.saveUser(body.user, body.id);
+        return await this.userService.saveUser(body.user, body.authId);
     }
 
 }

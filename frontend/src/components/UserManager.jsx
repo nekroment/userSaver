@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI, authAPI } from '../api/api';
 import NotSavedUsersColumn from './NotSavedUsersColumn';
+import SavedUsersColumn from './SavedUsersColumn';
 import { withRouter } from 'react-router-dom';
 import Modal from 'react-modal';
 import ModalWindow from './ModalWindow';
@@ -20,7 +21,8 @@ const UserManager = (props) => {
 
     //Состояния
     const [googleLink, setGoogleLink] = useState('');
-    const [users, setUsers] = useState([]);
+    const [savedUsers, setSavedUsers] = useState([]);
+    const [notSavedUsers, setNotSavedUsers] = useState([]);
     const [modalPosts, setModalPosts] = useState([]);
     const [modalUser, setModalUser] = useState({});
     const [isAuth, setIsAuth] = useState(false);
@@ -31,7 +33,28 @@ const UserManager = (props) => {
     //Запрос пользователей
     async function getUsers() {
         const response = await userAPI.getUsers();
-        setUsers((users) => { return response.data });
+        let isSave = [];
+        let saveUsers;
+        if (localStorage.getItem('_id')) {
+            isSave = await userAPI.findUsers(localStorage.getItem('_id'));
+            saveUsers = response.data.map((user) => {
+                for (let i = 0; i < isSave.data.length; i++) {
+                    if (user.id === isSave.data[i].id) {
+                        user.isSave = true;
+                        return user;
+                    }
+                }
+                user.isSave = false;
+                return user;
+            })
+        } else {
+            saveUsers = response.data.map((user) => {
+                user.isSave = false;
+                return user;
+            })
+        }
+        setSavedUsers((savedUsers) => { return saveUsers.filter(user => user.isSave === true) });
+        setNotSavedUsers((notSavedUsers) => { return saveUsers.filter(user => user.isSave === false) });
     }
 
     //Запрос постов
@@ -84,6 +107,21 @@ const UserManager = (props) => {
         setModalPosts(() => { return [] });
         setModalUser(() => { return {} });
         setIsModal(isModal => false);
+    }
+
+    async function saveUser(user) {
+        if (localStorage.getItem('_id')) {
+            const response = await userAPI.saveUser(user, localStorage.getItem('_id'));
+            getUsers();
+        }
+
+    }
+
+    async function deleteUser(user) {
+        if (localStorage.getItem('_id')) {
+            const response = await userAPI.deleteUser(user, localStorage.getItem('_id'));
+            getUsers();
+        }
 
     }
 
@@ -124,11 +162,11 @@ const UserManager = (props) => {
             </nav>
             <div className="container">
                 <div className="row">
-                    <div className={"col-lg-5 col-md-5 col-sm-10 col-xs-10"}>
-                        <NotSavedUsersColumn openModal={openModal} users={users} />
+                    <div className={"col-lg-5 col-md-10 col-sm-10 col-xs-10"}>
+                        <NotSavedUsersColumn saveUser={saveUser} openModal={openModal} users={notSavedUsers} />
                     </div>
-                    <div className={"col-lg-5 col-md-5 col-sm-10 col-xs-10 offset-lg-1 offset-md-1"}>
-                        <NotSavedUsersColumn openModal={openModal} users={users} />
+                    <div className={"col-lg-5 col-md-10 col-sm-10 col-xs-10 offset-lg-1"}>
+                        <SavedUsersColumn deleteUser={deleteUser} openModal={openModal} users={savedUsers} />
                     </div>
                 </div>
             </div>
