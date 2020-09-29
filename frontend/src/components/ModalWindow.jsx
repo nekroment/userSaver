@@ -5,7 +5,8 @@ const ModalWindow = ({ user, posts }) => {
     function createPostCard() {
         return posts.map((post) => {
             return (<div key={post.id} className="jumbotron" style={{ backgroundColor: "green", color: "white" }}>
-                <p>{post.title}</p>
+                <p style={{fontWeight: 'bolder'}}>{post.title}</p>
+                <hr className="my-4"></hr>
                 <p>{post.body}</p>
             </div>)
         })

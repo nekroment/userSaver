@@ -21,11 +21,12 @@ const User = ({ user, openModal, saveUser, deleteUser, isSaved }) => {
             isDragging: monitor.isDragging()
         })
     })
+
     const opacity = isDragging ? 0 : 1;
     return (
         <div ref={drag} style={{ opacity, wordWrap: 'break-word'}} onDoubleClick={() => openModal(user)} className={'jumbotron m-3 align-self-center'}>
             <p style={{fontWeight: 'bolder'}}>{user.name}</p>
-            <hr class="my-4"></hr>
+            <hr className="my-4"></hr>
             <p>username: {user.username}</p>
             <p>adress: {user.address.city}</p>
             <p>email: {user.email}</p>

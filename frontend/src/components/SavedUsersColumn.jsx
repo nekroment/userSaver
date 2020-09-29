@@ -5,12 +5,10 @@ import { ItemTypes } from '../common/ItemTypes';
 
 const SavedUsersColumn = (props) => {
 
-    const [{ canDrop, isOver }, drop] = useDrop({
+    const [, drop] = useDrop({
         accept: ItemTypes.USER,
         drop: () => ({ name: 'saveColumn' }),
         collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop()
         })
     })
 
@@ -47,23 +45,23 @@ const SavedUsersColumn = (props) => {
         <>
 
             <div ref={drop} style={{ backgroundColor: "blue" }}>
-                <form onSubmit={changeSort}>
-                    <select ref={ref} onChange={changeSort} className="form-control">
-                        <option value='username' selected>Username</option>
+                <form>
+                    <select defaultValue={'username'} ref={ref} onChange={changeSort} className="form-control">
+                        <option value='username'>Username</option>
                         <option value='email' >Email</option>
                         <option value='address' >Adress</option>
                         <option value='website' >Website</option>
                     </select>
                 </form>
                 {usersCards.length > 0 ? usersCards :
-                        <div style={{ wordWrap: 'break-word', }} className={'jumbotron m-3 align-self-center'}>
-                            <p style={{ fontWeight: 'bolder' }}>Нет сохранненных пользователей</p>
-                            <hr class="my-4"></hr>
-                            <p>Перетащите сюда карточку пользователя, чтобы сохранить</p>
-                        </div>
+                    <div style={{ wordWrap: 'break-word', }} className={'jumbotron m-3 align-self-center'}>
+                        <p style={{ fontWeight: 'bolder' }}>Нет сохранненных пользователей</p>
+                        <hr className="my-4"></hr>
+                        <p>Перетащите сюда карточку пользователя, чтобы сохранить</p>
+                    </div>
                 }
+                <div className={"row"}></div>
             </div>
-
         </>
     )
 }

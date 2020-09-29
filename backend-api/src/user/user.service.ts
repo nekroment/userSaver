@@ -7,10 +7,12 @@ import { Model } from 'mongoose';
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+    //Нахождение всех сохранненых карточек user у определенного пользователя
     async findSavedUsers(id: string) {
         return await this.userModel.find({authId: id});
     }
 
+    //Сохранение карточки user
     async saveUser(user: User, authId: string) {
         const newUser = user;
         newUser.authId = authId;
@@ -18,6 +20,7 @@ export class UserService {
         return await createUser.save();
     }
 
+    //Удаление карточки user
     async deleteUser(id: number | string, authId: string) {
         return await this.userModel.remove({id: id, authId: authId})
     }

@@ -11,10 +11,12 @@ require('dotenv/config');
 export class AuthService {
   constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) {}
 
+  //Найти уже некогда авторизировавшегося пользователя
   async findUser(_id: string): Promise<Auth> {
     return this.authModel.findOne({ _id: _id });
   }
 
+  //Подключение к проекту Google
   async connection(redirect: string) {
     const googleConfig = {
       clientId: `${process.env.CLIENT_ID}`,
@@ -29,12 +31,14 @@ export class AuthService {
     );
   }
 
+  //Сохранение пользователя в базе данных и отправка его данных на Front
   async saveUser(redirect: string, code: string): Promise<Auth | string> {
     const auth = await this.connection(redirect);
 
     const data = await auth.getToken(code);
     const token = data.tokens.id_token;
 
+    //Проверка токена на ликвидность
     const client = new OAuth2Client(process.env.CLIENT_ID);
     async function verify() {
       const ticket = await client.verifyIdToken({
@@ -50,6 +54,7 @@ export class AuthService {
       throw error;
     }
 
+    //Запрос данных пользователя
     const user = await Axios.get(
       `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`,
     );
@@ -67,6 +72,7 @@ export class AuthService {
     return newUser.save();
   }
 
+  //Получение ссылки на авторизацию в Google
   async createConnectionString(redirect: string): Promise<{}> {
     const auth = await this.connection(redirect);
 

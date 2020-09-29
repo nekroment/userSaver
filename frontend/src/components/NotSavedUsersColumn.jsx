@@ -5,12 +5,10 @@ import { ItemTypes } from '../common/ItemTypes';
 
 const NotSavedUsersColumn = (props) => {
 
-    const [{ canDrop, isOver }, drop] = useDrop({
+    const [, drop] = useDrop({
         accept: ItemTypes.USER,
         drop: () => ({ name: 'deleteColumn' }),
         collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop()
         })
     })
 
@@ -48,8 +46,8 @@ const NotSavedUsersColumn = (props) => {
 
             <div ref={drop} style={{ backgroundColor: "blue" }}>
                 <form onSubmit={changeSort}>
-                    <select ref={ref} onChange={changeSort} className="form-control">
-                        <option value='username' selected>Username</option>
+                    <select defaultValue={'username'} ref={ref} onChange={changeSort} className="form-control">
+                        <option value='username'>Username</option>
                         <option value='email' >Email</option>
                         <option value='address' >Adress</option>
                         <option value='website' >Website</option>
@@ -58,10 +56,11 @@ const NotSavedUsersColumn = (props) => {
                 {usersCards.length > 0 ? usersCards :
                         <div style={{ wordWrap: 'break-word', }} className={'jumbotron m-3 align-self-center'}>
                             <p style={{ fontWeight: 'bolder' }}>Нет не сохраненных данных</p>
-                            <hr class="my-4"></hr>
+                            <hr className="my-4"></hr>
                             <p>Перетащите сюда карточку пользователя, чтобы удалить</p>
                         </div>
                 }
+                <div className={"row"}></div>
             </div>
 
         </>

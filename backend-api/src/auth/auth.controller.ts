@@ -12,20 +12,42 @@ import { LoginDTO, ConnectDTO } from './dto/login.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  //Запрос на получение ссылки на авторизацию в Google
   @Post('connection')
   async connect(@Body() body: ConnectDTO) {
-    const connectionString = await this.authService.createConnectionString(
-      body.redirect,
-    );
-    return connectionString;
+    try {
+      const connectionString = await this.authService.createConnectionString(
+        body.redirect,
+      );
+      return connectionString;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error
+        },
+        HttpStatus.BAD_REQUEST
+      );
+    }
   }
 
+  //Запрос на авторизацию в Google
   @Post('login')
   async login(@Body() body: LoginDTO) {
     if (body._id != '') {
-      const userExists = await this.authService.findUser(body._id);
-      if (userExists) {
-        return userExists;
+      try {
+        const userExists = await this.authService.findUser(body._id);
+        if (userExists) {
+          return userExists;
+        }
+      } catch (error) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: error
+          },
+          HttpStatus.BAD_REQUEST
+        );
       }
     }
     try {
@@ -35,9 +57,9 @@ export class AuthController {
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
-          error: 'Wrong token',
+          error: 'Wrong token'
         },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }
