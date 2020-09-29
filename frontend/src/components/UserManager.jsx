@@ -5,12 +5,14 @@ import SavedUsersColumn from './SavedUsersColumn';
 import { withRouter } from 'react-router-dom';
 import Modal from 'react-modal';
 import ModalWindow from './ModalWindow';
+import Navbar from './NavBar';
 const queryString = require('query-string');
 require('dotenv/config');
 Modal.setAppElement('#root');
 
 const UserManager = (props) => {
 
+    //Шаблон авторизированного пользователя
     const emptyUser = {
         name: '',
         email: '',
@@ -32,35 +34,43 @@ const UserManager = (props) => {
 
     //Запрос пользователей
     async function getUsers() {
-        const response = await userAPI.getUsers();
-        let isSave = [];
-        let saveUsers;
-        if (localStorage.getItem('_id')) {
-            isSave = await userAPI.findUsers(localStorage.getItem('_id'));
-            saveUsers = response.data.map((user) => {
-                for (let i = 0; i < isSave.data.length; i++) {
-                    if (user.id === isSave.data[i].id) {
-                        user.isSave = true;
-                        return user;
+        try {
+            const response = await userAPI.getUsers();
+            let isSave = [];
+            let saveUsers;
+            if (localStorage.getItem('_id')) {
+                isSave = await userAPI.findUsers(localStorage.getItem('_id'));
+                saveUsers = response.data.map((user) => {
+                    for (let i = 0; i < isSave.data.length; i++) {
+                        if (user.id === isSave.data[i].id) {
+                            user.isSave = true;
+                            return user;
+                        }
                     }
-                }
-                user.isSave = false;
-                return user;
-            })
-        } else {
-            saveUsers = response.data.map((user) => {
-                user.isSave = false;
-                return user;
-            })
+                    user.isSave = false;
+                    return user;
+                })
+            } else {
+                saveUsers = response.data.map((user) => {
+                    user.isSave = false;
+                    return user;
+                })
+            }
+            setSavedUsers((savedUsers) => { return saveUsers.filter(user => user.isSave === true) });
+            setNotSavedUsers((notSavedUsers) => { return saveUsers.filter(user => user.isSave === false) });
+        } catch (error) {
+            throw error;
         }
-        setSavedUsers((savedUsers) => { return saveUsers.filter(user => user.isSave === true) });
-        setNotSavedUsers((notSavedUsers) => { return saveUsers.filter(user => user.isSave === false) });
     }
 
     //Запрос постов
     async function getPosts() {
-        const response = await userAPI.getPosts();
-        setPosts(posts => response.data);
+        try {
+            const response = await userAPI.getPosts();
+            setPosts(posts => response.data);
+        } catch (error) {
+            throw error;
+        }
     }
 
     //Запрос ссылки авторизации
@@ -69,6 +79,7 @@ const UserManager = (props) => {
             const response = await authAPI.connection(redirect);
             setGoogleLink(link => response.data);
         } catch (error) {
+            throw error;
         }
     }
 
@@ -83,6 +94,7 @@ const UserManager = (props) => {
                 setIsAuth(isAuth => true);
                 localStorage.setItem('_id', response.data._id);
             } catch (error) {
+                throw error;
             }
         }
     }
@@ -94,43 +106,64 @@ const UserManager = (props) => {
         localStorage.removeItem('_id');
     }
 
+    //Модальное окно открыто
     async function openModal(user) {
-        const userPosts = await posts.filter(post => post.userId === user.id);
-        setModalPosts(() => { return userPosts });
-        setModalUser(() => { return user });
-        setIsModal(isModal => true);
-
+        try {
+            const userPosts = await posts.filter(post => post.userId === user.id);
+            setModalPosts(() => { return userPosts });
+            setModalUser(() => { return user });
+            setIsModal(isModal => true);
+        } catch (error) {
+            throw error;
+        }
     }
 
+    //Модальное окно закрыто
     async function closeModal() {
-
         setModalPosts(() => { return [] });
         setModalUser(() => { return {} });
         setIsModal(isModal => false);
     }
 
+    //Сохранение карточки user
     async function saveUser(user) {
         if (localStorage.getItem('_id')) {
-            const response = await userAPI.saveUser(user, localStorage.getItem('_id'));
-            getUsers();
+            try {
+                await userAPI.saveUser(user, localStorage.getItem('_id'));
+                getUsers();
+            } catch (error) {
+                throw error;
+            }
         }
-
     }
 
+    //Удаление карточки user
     async function deleteUser(user) {
         if (localStorage.getItem('_id')) {
-            const response = await userAPI.deleteUser(user, localStorage.getItem('_id'));
-            getUsers();
+            try {
+                await userAPI.deleteUser(user, localStorage.getItem('_id'));
+                getUsers();
+            } catch (error) {
+                throw error;
+            }
         }
-
     }
 
-    //Если сохраннен id пользователя, сделать запрос к базе данных на авторизацию
-    useEffect(async () => {
-        if (localStorage.getItem('_id')) {
+    //запрос к базе данных на авторизацию
+    async function idAuth() {
+        try {
             const response = await authAPI.login(localStorage.getItem('_id'), '', redirect);
             setUserData(user => response.data);
             setIsAuth(isAuth => true);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    //Если сохраннен id пользователя, сделать запрос к базе данных на авторизацию
+    useEffect(() => {
+        if (localStorage.getItem('_id')) {
+            idAuth();
         }
     }, []);
 
@@ -152,14 +185,7 @@ const UserManager = (props) => {
 
     return (
         <>
-            <nav class="navbar navbar-light bg-info">
-                <span class="navbar-brand h1">
-                    <img src={userData.img} className={isAuth ? '' : 'hidden'} width="30" height="30" alt="" loading="lazy" />
-                    <p className={isAuth ? '' : 'hidden'} >{userData.name}</p>
-                </span>
-                <a href={`${googleLink}`} className={"btn btn-default btn-lg" + " " + (!isAuth ? '' : 'hidden')} role="button">Login with Google</a>
-                <a onClick={logOut} className={"btn btn-default btn-lg" + ' ' + (isAuth ? '' : 'hidden')} role="button">LogOut</a>
-            </nav>
+            <Navbar logOut={logOut} googleLink={googleLink} name={userData.name} img={userData.img} isAuth={isAuth}/>
             <div className="container">
                 <div className="row">
                     <div className={"col-lg-5 col-md-10 col-sm-10 col-xs-10"}>
