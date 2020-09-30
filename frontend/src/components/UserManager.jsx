@@ -19,7 +19,7 @@ const UserManager = (props) => {
         img: '',
         _id: ''
     }
-    const redirect = 'http://localhost:3002'
+    const redirect = `${process.env.REDIRECT}`
 
     //Состояния
     const [googleLink, setGoogleLink] = useState('');
